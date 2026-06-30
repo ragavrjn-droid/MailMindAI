@@ -140,3 +140,15 @@ Prevent duplicate processing.
 - AI as a Decision Layer
 - Configuration Driven
 - Local First
+
+## Authentication
+
+MailMindAI authenticates using Google's OAuth Desktop Application flow.
+
+The first run opens a browser for user consent.
+
+Google returns an OAuth token.
+
+Subsequent runs reuse the saved token until it expires.
+
+No passwords are stored.
