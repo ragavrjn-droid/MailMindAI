@@ -19,3 +19,10 @@ credentials/
 
 # Environment Variables
 .env
+
+# Google OAuth
+credentials/client_secret.json
+credentials/token.json
+
+# Environment variables
+.env
