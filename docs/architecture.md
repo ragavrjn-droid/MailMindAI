@@ -152,3 +152,44 @@ Google returns an OAuth token.
 Subsequent runs reuse the saved token until it expires.
 
 No passwords are stored.
+
+                    MailMindAI v1
+
+                +------------------+
+                |     Scheduler    |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                |   Gmail Service  |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                |   Email Parser   |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                | Candidate Filter |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                | Ollama (Qwen)    |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                |   Guardrails     |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                |     SQLite       |
+                +---------+--------+
+                          |
+                          v
+                +------------------+
+                | WhatsApp Service |
+                +------------------+
