@@ -15,19 +15,42 @@ class AIService:
     MODEL = "gemma3:4b"
 
     PROMPT_TEMPLATE = """
-You are an AI email extraction engine.
-
-Your task is to analyse the email below.
+You are an AI email classifier.
 
 Return ONLY valid JSON.
 
-Do not explain your reasoning.
+Do not explain.
+
+Do not think aloud.
 
 Do not use markdown.
 
-Do not wrap the JSON inside triple backticks.
+Do not output any text before or after the JSON.
 
-If the email is NOT related to recruitment, interviews, job applications, hiring, assessments, offers, recruiters or careers, return:
+IMPORTANT:
+
+A recruitment email is a PERSONAL communication regarding a job application.
+
+Examples:
+
+- Interview invitation
+- Recruiter outreach
+- HR communication
+- Assessment invitation
+- Coding challenge
+- Offer letter
+- Application status update
+
+These are NOT recruitment emails:
+
+- Job alerts
+- Job recommendations
+- Career newsletters
+- Marketing emails
+- Company newsletters
+- Promotional emails
+
+If the email is NOT a recruitment email, return:
 
 {{
     "is_recruitment": false,
@@ -38,7 +61,7 @@ If the email is NOT related to recruitment, interviews, job applications, hiring
     "confidence": 0.0
 }}
 
-Otherwise return exactly this schema:
+Otherwise return:
 
 {{
     "is_recruitment": true,
@@ -63,10 +86,6 @@ Body:
 
     @classmethod
     def analyze_email(cls, email: Email) -> dict:
-        """
-        Sends an email to Ollama and returns
-        a Python dictionary.
-        """
 
         prompt = cls.PROMPT_TEMPLATE.format(
             sender=email.sender,
@@ -89,42 +108,52 @@ Body:
                 errors="ignore",
             )
 
+            if result.returncode != 0:
+                return cls._default_response(result.stderr.strip())
+
             response = cls._clean_response(result.stdout)
 
             return json.loads(response)
 
         except Exception as ex:
 
-            return {
-                "is_recruitment": False,
-                "company": "",
-                "role": "",
-                "interview_date": "",
-                "action_required": "",
-                "confidence": 0.0,
-                "error": str(ex),
-            }
+            return cls._default_response(str(ex))
 
     @staticmethod
     def _clean_response(response: str) -> str:
-        """
-        Cleans the response returned by the LLM
-        before parsing it as JSON.
-        """
 
         if not response:
             return "{}"
 
         response = response.replace("```json", "")
         response = response.replace("```", "")
+
+        response = response.replace("<think>", "")
+        response = response.replace("</think>", "")
+
+        response = response.replace("\x00", "")
+
         response = response.strip()
 
-        # Sometimes the model writes text before or
-        # after the JSON. Keep only the JSON object.
         start = response.find("{")
         end = response.rfind("}")
 
-        if start != -1 and end != -1:
-            response = response[start:end + 1]
+        if start == -1 or end == -1:
+            return "{}"
+
+        response = response[start:end + 1]
 
         return response
+
+    @staticmethod
+    def _default_response(error: str = "") -> dict:
+
+        return {
+            "is_recruitment": False,
+            "company": "",
+            "role": "",
+            "interview_date": "",
+            "action_required": "",
+            "confidence": 0.0,
+            "error": error,
+        }

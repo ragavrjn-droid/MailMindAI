@@ -38,16 +38,27 @@ def main():
         print("\nAI Result")
         print("-" * 50)
 
-        if "error" in result:
-            print(f"Error : {result['error']}")
+        # AI failed
+        if result.get("error"):
+
+            print("Status : AI Error")
+            print(f"Reason : {result['error']}")
             continue
 
-        print(f"Recruitment     : {result['is_recruitment']}")
-        print(f"Company         : {result['company']}")
-        print(f"Role            : {result['role']}")
-        print(f"Interview Date  : {result['interview_date']}")
-        print(f"Action Required : {result['action_required']}")
-        print(f"Confidence      : {result['confidence']}")
+        # Not recruitment
+        if not result.get("is_recruitment", False):
+
+            print("Status : Not a recruitment email")
+            print(f"Confidence : {result.get('confidence', 0.0)}")
+            continue
+
+        # Recruitment email
+        print("Status          : Recruitment Email")
+        print(f"Company         : {result.get('company', '')}")
+        print(f"Role            : {result.get('role', '')}")
+        print(f"Interview Date  : {result.get('interview_date', '')}")
+        print(f"Action Required : {result.get('action_required', '')}")
+        print(f"Confidence      : {result.get('confidence', 0.0)}")
 
     print("\nApplication finished.")
 
