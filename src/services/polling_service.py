@@ -1,6 +1,7 @@
 import time
 
 from services.pipeline_service import PipelineService
+from services.notification_service import NotificationService
 
 
 class PollingService:
@@ -10,7 +11,7 @@ class PollingService:
     Responsibilities:
         - Authenticate Gmail once
         - Execute the pipeline periodically
-        - Display processing results
+        - Notify the user about recruitment emails
     """
 
     POLL_INTERVAL = 60  # seconds
@@ -52,12 +53,7 @@ class PollingService:
                         print(f"Skipped : {item['reason']}")
                         continue
 
-                    print("✅ Recruitment Email")
-                    print(f"Company : {result.get('company', '')}")
-                    print(f"Role    : {result.get('role', '')}")
-                    print(f"Date    : {result.get('interview_date', '')}")
-                    print(f"Action  : {result.get('action_required', '')}")
-                    print(f"Confidence : {result.get('confidence', 0.0)}")
+                    NotificationService.send(result)
 
                 print(f"\nSleeping {self.POLL_INTERVAL} seconds...\n")
 
