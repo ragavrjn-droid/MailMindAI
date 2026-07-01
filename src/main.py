@@ -11,16 +11,31 @@ def main():
 
     gmail.authenticate()
 
-    email = gmail.get_latest_email()
+    emails = gmail.search_emails(
+        query="is:unread",
+        limit=10,
+    )
 
-    if email:
-        print("\nLatest Email")
-        print("-" * 50)
-        print(f"From    : {email['from']}")
-        print(f"Subject : {email['subject']}")
-        print(f"Date    : {email['date']}")
+    if emails:
+        print(f"\nFound {len(emails)} unread email(s)")
+        print("=" * 50)
+
+        for index, email in enumerate(emails, start=1):
+            print(f"\nEmail #{index}")
+            print("-" * 50)
+            print(f"From    : {email.sender}")
+            print(f"Subject : {email.subject}")
+            print(f"Date    : {email.date}")
+
+            preview = email.body.strip() if email.body else "(No body found)"
+            if len(preview) > 300:
+                preview = preview[:300] + "..."
+
+            print("\nBody Preview")
+            print("-" * 50)
+            print(preview)
     else:
-        print("Inbox is empty.")
+        print("\nNo unread emails found.")
 
     print("\nApplication finished.")
 
