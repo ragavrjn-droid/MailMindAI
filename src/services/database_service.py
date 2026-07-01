@@ -9,8 +9,8 @@ class DatabaseService:
     Responsibilities:
         - Create database
         - Create tables
-        - Check whether an email has already been processed
-        - Save processed emails
+        - Check processed emails
+        - Save AI analysis
     """
 
     DATABASE_PATH = Path("database/mailmindai.db")
@@ -26,29 +26,42 @@ class DatabaseService:
 
     def create_tables(self):
         """
-        Creates the processed_emails table
-        if it does not already exist.
+        Creates the processed_emails table.
         """
 
-        self.cursor.execute("""
+        self.cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS processed_emails (
 
                 message_id TEXT PRIMARY KEY,
 
-                sender TEXT,
+                sender TEXT NOT NULL,
 
-                subject TEXT,
+                subject TEXT NOT NULL,
+
+                company TEXT,
+
+                role TEXT,
+
+                interview_date TEXT,
+
+                action_required TEXT,
+
+                confidence REAL,
+
+                is_recruitment INTEGER,
 
                 processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
             )
-        """)
+            """
+        )
 
         self.connection.commit()
 
     def is_processed(self, message_id: str) -> bool:
         """
-        Returns True if this Gmail message
+        Returns True if the email
         has already been analysed.
         """
 
@@ -58,38 +71,77 @@ class DatabaseService:
             FROM processed_emails
             WHERE message_id = ?
             """,
-            (message_id,)
+            (message_id,),
         )
 
         return self.cursor.fetchone() is not None
 
-    def mark_processed(self, email):
+    def mark_processed(self, email, result: dict):
         """
-        Saves an email as processed.
+        Saves an analysed email.
         """
 
         self.cursor.execute(
             """
             INSERT OR IGNORE INTO processed_emails
             (
+
                 message_id,
+
                 sender,
-                subject
+
+                subject,
+
+                company,
+
+                role,
+
+                interview_date,
+
+                action_required,
+
+                confidence,
+
+                is_recruitment
+
             )
-            VALUES (?, ?, ?)
+
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 email.message_id,
                 email.sender,
                 email.subject,
-            )
+                result.get("company", ""),
+                result.get("role", ""),
+                result.get("interview_date", ""),
+                result.get("action_required", ""),
+                result.get("confidence", 0.0),
+                int(result.get("is_recruitment", False)),
+            ),
         )
 
         self.connection.commit()
 
+    def get_all_processed(self):
+        """
+        Returns all processed emails.
+        Useful later for dashboards.
+        """
+
+        self.cursor.execute(
+            """
+            SELECT *
+            FROM processed_emails
+            ORDER BY processed_at DESC
+            """
+        )
+
+        return self.cursor.fetchall()
+
     def close(self):
         """
-        Close database connection.
+        Closes the SQLite connection.
         """
 
         self.connection.close()
