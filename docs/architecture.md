@@ -1,195 +1,238 @@
-# MailMindAI - System Architecture
+# MailMindAI Architecture
 
-## Project Goal
+## Overview
 
-MailMindAI is an autonomous AI agent that monitors Gmail for job-related emails, understands them using a local Large Language Model (LLM), extracts structured interview information, and sends WhatsApp notifications.
+MailMindAI is a privacy-first AI agent that continuously monitors Gmail for recruitment-related emails, analyses them using a local Large Language Model (LLM), validates the AI response, stores processing history, and sends real-time WhatsApp notifications.
+
+All AI processing is performed locally using Ollama and Gemma 3, ensuring that email contents are never sent to external AI providers.
 
 ---
 
-# High-Level Architecture
+## System Architecture
 
-                     Gmail
-                        │
-                        ▼
-              Gmail Authentication
-                        │
-                        ▼
-               Email Collector
-          (Inbox + Spam/Junk)
-                        │
-                        ▼
-           Lightweight Rule Filter
-        (Keywords + Sender Analysis)
-                        │
-            ┌───────────┴────────────┐
-            │                        │
-      Ignore Email            Possible Job Email
-            │                        │
-            ▼                        ▼
-        Save State             Local AI (Qwen)
-                                    │
-                                    ▼
-                        Structured JSON Extraction
-                                    │
-                                    ▼
-                           Guardrails Validation
-                                    │
-                    ┌───────────────┴───────────────┐
-                    │                               │
-                Ignore                        Valid Interview
-                    │                               │
-                    ▼                               ▼
-              Save Result                 WhatsApp Notification
-                    │                               │
-                    └───────────────┬───────────────┘
-                                    ▼
-                              SQLite Database
+<p align="center">
+    <img src="../assets/architecture.png" alt="MailMindAI Architecture" width="100%">
+</p>
+
+---
+
+## Processing Pipeline
+
+```
+Polling Service
+        │
+        ▼
+Pipeline Service
+        │
+        ▼
+Gmail Service
+        │
+        ▼
+Unread Emails
+        │
+        ▼
+Already Processed?
+      │        │
+     Yes       No
+      │        ▼
+   Ignore   AI Service
+                │
+                ▼
+        Ollama + Gemma 3
+                │
+                ▼
+       Structured JSON Result
+                │
+                ▼
+        Guardrail Service
+          │           │
+      Invalid      Valid
+          │           ▼
+      Save State  Notification Service
+                      │
+                      ▼
+                 Twilio Service
+                      │
+                      ▼
+                 WhatsApp User
+```
 
 ---
 
 # Components
 
-## Gmail Service
+## PollingService
 
-Responsible for:
-
-- OAuth Authentication
-- Reading Inbox
-- Reading Spam/Junk
-- Downloading email contents
-
----
-
-## Rule Engine
-
-Before using AI, perform inexpensive checks.
-
-Examples:
-
-- Recruiter domains
-- Keywords
-- Careers emails
-
-Purpose:
-
-Reduce unnecessary AI processing.
-
----
-
-## AI Service
-
-Uses a local LLM through Ollama.
+Responsible for running MailMindAI continuously.
 
 Responsibilities:
 
-- Understand email
-- Extract structured information
-- Determine interview relevance
-- Generate JSON output
+- Runs every configured interval
+- Starts the processing pipeline
+- Handles graceful shutdown
 
 ---
 
-## Guardrails
+## PipelineService
 
-Validate AI output before taking action.
+Coordinates the complete email processing workflow.
 
-Checks include:
+Responsibilities:
 
-- Valid JSON
-- Required fields
-- Confidence threshold
-- Interview category
+- Retrieve unread emails
+- Skip previously processed emails
+- Call the AI service
+- Validate AI output
+- Persist results
+- Trigger notifications
 
 ---
 
-## Notification Service
+## GmailService
 
-Initially:
+Handles all Gmail API communication.
+
+Responsibilities:
+
+- OAuth authentication
+- Search unread emails
+- Retrieve email content
+
+---
+
+## AIService
+
+Communicates with the local Ollama model.
+
+Responsibilities:
+
+- Build prompts
+- Send prompts to Gemma 3
+- Parse JSON response
+- Handle AI errors
+
+---
+
+## GuardrailService
+
+Validates AI output before further processing.
+
+Responsibilities:
+
+- Verify required fields
+- Check confidence
+- Prevent false positives
+- Reject malformed responses
+
+---
+
+## DatabaseService
+
+Stores processing history.
+
+Responsibilities:
+
+- Store processed message IDs
+- Prevent duplicate processing
+- Persist AI extraction results
+
+Database:
+
+- SQLite
+
+---
+
+## NotificationService
+
+Creates user-friendly notifications.
+
+Current notification channels:
 
 - WhatsApp
 
-Future:
+Future channels:
 
+- Email
 - Telegram
 - Slack
+- Microsoft Teams
 - Discord
-- Email
 
 ---
 
-## Database
+## TwilioService
 
-SQLite stores:
+Responsible for communicating with the Twilio WhatsApp API.
 
-- Processed Email IDs
-- AI Results
-- Processing Time
-- Notification Status
+Responsibilities:
 
-Purpose:
-
-Prevent duplicate processing.
+- Format API requests
+- Send WhatsApp messages
+- Return delivery status
 
 ---
 
 # Design Principles
 
-- Modular Architecture
+MailMindAI follows several software engineering principles.
+
 - Single Responsibility Principle
-- Loose Coupling
-- AI as a Decision Layer
-- Configuration Driven
-- Local First
+- Separation of Concerns
+- Modular Architecture
+- Local-First AI
+- Privacy by Design
+- Extensible Service Layer
+- Persistent State Management
 
-## Authentication
+---
 
-MailMindAI authenticates using Google's OAuth Desktop Application flow.
+# Current Workflow
 
-The first run opens a browser for user consent.
+```
+Gmail
 
-Google returns an OAuth token.
+↓
 
-Subsequent runs reuse the saved token until it expires.
+Unread Email
 
-No passwords are stored.
+↓
 
-                    MailMindAI v1
+Pipeline
 
-                +------------------+
-                |     Scheduler    |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                |   Gmail Service  |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                |   Email Parser   |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                | Candidate Filter |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                | Ollama (Qwen)    |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                |   Guardrails     |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                |     SQLite       |
-                +---------+--------+
-                          |
-                          v
-                +------------------+
-                | WhatsApp Service |
-                +------------------+
+↓
+
+Gemma 3
+
+↓
+
+Guardrails
+
+↓
+
+SQLite
+
+↓
+
+WhatsApp Notification
+```
+
+---
+
+# Future Architecture
+
+The current MailMindAI project is the foundation of a larger open-source platform named **Career Assistant AI**.
+
+Future modules include:
+
+- Job Search Engine
+- Resume Parser
+- AI Job Matching
+- Google Calendar Integration
+- Interview Preparation
+- Application Tracking
+- RAG Knowledge Base
+- Dashboard
+- Multi-LLM Support
+- Plugin Architecture
+
+These modules will extend the existing service-based architecture without requiring major changes to the core pipeline.
