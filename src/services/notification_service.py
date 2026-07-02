@@ -1,26 +1,40 @@
+from services.twilio_service import TwilioService
+
+
 class NotificationService:
     """
-    Handles all user notifications.
+    Handles user notifications.
 
-    Currently notifications are printed to
-    the console.
-
-    Later this service will send WhatsApp
-    messages without changing the rest of
-    the application.
+    Responsibility:
+        - Format recruitment notifications
+        - Delegate message delivery to TwilioService
     """
 
-    @staticmethod
-    def send(result: dict):
+    def __init__(self):
 
-        print("\n" + "=" * 60)
-        print("📬 NEW RECRUITMENT EMAIL")
-        print("=" * 60)
+        self.twilio = TwilioService()
 
-        print(f"Company         : {result.get('company', 'Unknown')}")
-        print(f"Role            : {result.get('role', 'Unknown')}")
-        print(f"Interview Date  : {result.get('interview_date', 'Not provided')}")
-        print(f"Action Required : {result.get('action_required', 'None')}")
-        print(f"Confidence      : {result.get('confidence', 0.0)}")
+    def send(self, result: dict):
+        """
+        Sends a WhatsApp notification for
+        a recruitment email.
+        """
 
-        print("=" * 60)
+        message = f"""
+📬 MailMindAI detected a recruitment email
+
+🏢 Company: {result.get("company", "Unknown")}
+
+💼 Role: {result.get("role", "Unknown")}
+
+📅 Interview: {result.get("interview_date", "Not provided")}
+
+✅ Action: {result.get("action_required", "None")}
+
+🎯 Confidence: {result.get("confidence", 0.0)}
+"""
+
+        sid = self.twilio.send_message(message.strip())
+
+        print("✅ WhatsApp notification sent.")
+        print(f"Twilio SID: {sid}")

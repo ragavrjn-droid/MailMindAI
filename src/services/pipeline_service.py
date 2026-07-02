@@ -2,6 +2,7 @@ from services.gmail_service import GmailService
 from services.ai_service import AIService
 from services.guardrail_service import GuardrailService
 from services.database_service import DatabaseService
+from services.notification_service import NotificationService
 
 
 class PipelineService:
@@ -13,6 +14,7 @@ class PipelineService:
         - Skip already processed emails
         - Analyse emails using AI
         - Validate AI output
+        - Send WhatsApp notification
         - Store processed emails
         - Return structured results
     """
@@ -21,6 +23,7 @@ class PipelineService:
 
         self.gmail = GmailService()
         self.database = DatabaseService()
+        self.notification = NotificationService()
 
     def authenticate(self):
         """
@@ -66,7 +69,15 @@ class PipelineService:
 
             results.append(pipeline_result)
 
-            # Save so we never analyse it again
+            # Send WhatsApp notification only for valid recruitment emails
+            if is_valid:
+                try:
+                    self.notification.send(ai_result)
+                except Exception as ex:
+                    print(f"Notification Error: {ex}")
+                    continue
+
+            # Save only after successful processing
             self.database.mark_processed(email, ai_result)
 
         return results

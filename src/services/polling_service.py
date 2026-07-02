@@ -1,7 +1,6 @@
 import time
 
 from services.pipeline_service import PipelineService
-from services.notification_service import NotificationService
 
 
 class PollingService:
@@ -11,7 +10,7 @@ class PollingService:
     Responsibilities:
         - Authenticate Gmail once
         - Execute the pipeline periodically
-        - Notify the user about recruitment emails
+        - Display application status
     """
 
     POLL_INTERVAL = 60  # seconds
@@ -26,7 +25,7 @@ class PollingService:
         print("MailMindAI Started")
         print("=" * 50)
 
-        # Authenticate Gmail only once
+        # Authenticate Gmail once
         self.pipeline.authenticate()
 
         try:
@@ -40,20 +39,8 @@ class PollingService:
                 if not results:
                     print("No new emails to process.")
 
-                for item in results:
-
-                    email = item["email"]
-                    result = item["ai_result"]
-
-                    print("-" * 60)
-                    print(f"Subject : {email.subject}")
-                    print(f"From    : {email.sender}")
-
-                    if not item["valid"]:
-                        print(f"Skipped : {item['reason']}")
-                        continue
-
-                    NotificationService.send(result)
+                else:
+                    print(f"Processed {len(results)} new email(s).")
 
                 print(f"\nSleeping {self.POLL_INTERVAL} seconds...\n")
 
