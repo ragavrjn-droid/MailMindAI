@@ -4,11 +4,9 @@
 
 # MailMindAI 🤖
 
-> A privacy-first AI agent that monitors Gmail, detects recruitment emails using a local Large Language Model (LLM), extracts interview details, and instantly notifies you via WhatsApp.
+> Never miss an interview invitation again. MailMindAI continuously monitors Gmail, detects recruitment emails using a local Large Language Model, extracts interview details, and instantly notifies you via WhatsApp while keeping your data private.
 
-MailMindAI runs entirely on your own computer using **Ollama** and **Gemma 3**, allowing recruitment email monitoring without sending your personal emails to cloud AI providers.
-
-The project explores how local Large Language Models can be combined with workflow automation to build practical AI applications while keeping user data private.
+MailMindAI is an open-source, privacy-first AI automation project that runs entirely on your own computer using **Ollama** and **Gemma 3**. It demonstrates how local Large Language Models can be combined with traditional software engineering to build practical AI-powered workflows.
 
 > **Current Release:** v0.1.0
 
@@ -20,7 +18,7 @@ MailMindAI demonstrates an end-to-end AI automation workflow.
 
 It continuously monitors Gmail, identifies genuine recruitment emails, extracts interview information, stores processing history, and instantly sends WhatsApp notifications.
 
-The entire pipeline runs locally, combining traditional software engineering with modern Large Language Models.
+The entire pipeline runs locally, ensuring your emails never need to be processed by cloud AI providers.
 
 ---
 
@@ -28,13 +26,13 @@ The entire pipeline runs locally, combining traditional software engineering wit
 
 - 📧 Continuous Gmail monitoring
 - 🧠 Local AI email classification (Ollama + Gemma 3)
-- 🛡 AI guardrails to reduce false positives
+- 🛡 AI guardrails for safer AI outputs
 - 📅 Interview detail extraction
 - 💬 WhatsApp notifications via Twilio
 - 🗄 SQLite database for processed email tracking
 - 🔄 Background polling service
 - ⚙ Modular service-based architecture
-- 🔒 Privacy-first (runs locally)
+- 🔒 Privacy-first local processing
 
 ---
 
@@ -64,8 +62,6 @@ The entire pipeline runs locally, combining traditional software engineering wit
                                 WhatsApp
 ```
 
-A visual architecture diagram is shown below.
-
 <p align="center">
   <img src="assets/architecture.png" alt="Architecture Diagram" width="95%">
 </p>
@@ -78,7 +74,7 @@ A visual architecture diagram is shown below.
 New Gmail Email
         │
         ▼
-MailMindAI Polling Service
+Polling Service
         │
         ▼
 AI Classification
@@ -126,72 +122,31 @@ src/
 │   ├── polling_service.py
 │   └── twilio_service.py
 │
-├── utils/
-│
 └── main.py
 ```
 
 ---
 
-# Installation
-
-Clone the repository:
-
-```bash
-git clone https://github.com/ragavrjn-droid/MailMindAI.git
-cd MailMindAI
-```
-
-Create a virtual environment:
-
-```bash
-python -m venv venv
-```
-
-Activate the environment:
-
-**Windows**
-
-```bash
-venv\Scripts\activate
-```
-
-**macOS / Linux**
-
-```bash
-source venv/bin/activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Configure your Gmail OAuth credentials, Twilio credentials, and install Ollama with the Gemma 3 model before running the application.
-
----
-
 # Current Release (v0.1.0)
 
-Included in this release:
+This release includes:
 
 - ✅ Continuous Gmail monitoring
 - ✅ Local AI email classification
 - ✅ AI guardrails
-- ✅ Interview detail extraction
+- ✅ Interview information extraction
 - ✅ SQLite persistence
-- ✅ WhatsApp notifications
 - ✅ Duplicate email prevention
+- ✅ WhatsApp notifications
 - ✅ Background polling
 
 ---
 
 # Contributing
 
-Contributions are welcome.
+Contributions, bug reports, and suggestions are always welcome.
 
-If you'd like to improve the project, feel free to:
+If you'd like to contribute:
 
 - Open an Issue
 - Submit a Pull Request
@@ -211,18 +166,20 @@ See the `LICENSE` file for details.
 
 MailMindAI is under active development.
 
-The focus is on building practical, privacy-first AI automation using local Large Language Models.
+The goal is to explore practical AI automation using local Large Language Models while maintaining a clean, modular, and privacy-first architecture.
 
 ---
 
 # Support
 
-If you found this project interesting:
+If you found this project useful or interesting:
 
 - ⭐ Star the repository
 - 🐛 Report bugs
 - 💡 Suggest improvements
 - 📢 Share it with others
+
+Your support helps improve the project and encourages further open-source development.
 
 ---
 
