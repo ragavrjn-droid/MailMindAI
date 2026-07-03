@@ -6,25 +6,21 @@
 
 > A privacy-first AI agent that monitors Gmail, detects recruitment emails using a local Large Language Model (LLM), extracts interview details, and instantly notifies you via WhatsApp.
 
-MailMindAI runs entirely on your own computer using **Ollama** and **Gemma 3**, allowing you to automate recruitment email monitoring without sending your personal emails to cloud AI providers.
+MailMindAI runs entirely on your own computer using **Ollama** and **Gemma 3**, allowing recruitment email monitoring without sending your personal emails to cloud AI providers.
 
-This project is the first building block of a much larger vision: **Career Assistant AI** — an open-source AI career companion designed to help people throughout their entire job search journey.
+The project explores how local Large Language Models can be combined with workflow automation to build practical AI applications while keeping user data private.
+
+> **Current Release:** v0.1.0
 
 ---
 
 # Why MailMindAI?
 
-Searching for a job is difficult enough without worrying about missing important recruiter emails.
+MailMindAI demonstrates an end-to-end AI automation workflow.
 
-MailMindAI automatically:
+It continuously monitors Gmail, identifies genuine recruitment emails, extracts interview information, stores processing history, and instantly sends WhatsApp notifications.
 
-- Detects genuine recruitment emails
-- Filters out newsletters and job alerts
-- Extracts interview information
-- Tracks processed emails
-- Sends instant WhatsApp notifications
-
-No more repeatedly checking Gmail or worrying about missing an interview invitation.
+The entire pipeline runs locally, combining traditional software engineering with modern Large Language Models.
 
 ---
 
@@ -67,6 +63,12 @@ No more repeatedly checking Gmail or worrying about missing an interview invitat
                                      ▼
                                 WhatsApp
 ```
+
+A visual architecture diagram is shown below.
+
+<p align="center">
+  <img src="assets/architecture.png" alt="Architecture Diagram" width="95%">
+</p>
 
 ---
 
@@ -131,91 +133,57 @@ src/
 
 ---
 
-# Current Capabilities
+# Installation
 
-- ✅ Detect recruitment emails
-- ✅ Ignore newsletters and marketing emails
-- ✅ Extract interview information
-- ✅ Prevent duplicate processing
-- ✅ Persist processed emails using SQLite
-- ✅ Send WhatsApp notifications
-- ✅ Run continuously in the background
+Clone the repository:
 
----
+```bash
+git clone https://github.com/ragavrjn-droid/MailMindAI.git
+cd MailMindAI
+```
 
-# Roadmap
+Create a virtual environment:
 
-## Version 0.1 (Current)
+```bash
+python -m venv venv
+```
 
-- ✅ Gmail Monitoring
-- ✅ Local AI Classification
-- ✅ AI Guardrails
-- ✅ SQLite Persistence
-- ✅ WhatsApp Notifications
-- ✅ Background Polling
+Activate the environment:
 
----
+**Windows**
 
-## Version 0.2
+```bash
+venv\Scripts\activate
+```
 
-- 📅 Google Calendar Integration
-- ⏰ Automatic Interview Scheduling
-- 🔔 Interview Reminders
+**macOS / Linux**
 
----
+```bash
+source venv/bin/activate
+```
 
-## Version 0.3
+Install dependencies:
 
-- 📄 Resume Parsing
-- 🎯 AI Resume-to-Job Matching
-- 📊 Match Scoring
+```bash
+pip install -r requirements.txt
+```
+
+Configure your Gmail OAuth credentials, Twilio credentials, and install Ollama with the Gemma 3 model before running the application.
 
 ---
 
-## Version 0.4
+# Current Release (v0.1.0)
 
-- 🌍 Multi-source Job Search
-- 💼 Job Recommendation Engine
-- 📥 Job Deduplication
+Included in this release:
 
----
-
-## Version 0.5
-
-- 📝 Cover Letter Generation
-- 📄 Resume Tailoring
-- 📧 Follow-up Email Generation
-
----
-
-## Version 1.0
-
-### Career Assistant AI
-
-An open-source AI assistant that helps job seekers throughout their career journey.
-
-Features planned include:
-
-- Job discovery
-- AI-powered job matching
-- Application tracking
-- Recruitment email monitoring
-- Interview scheduling
-- Calendar integration
-- Resume optimization
-- Cover letter generation
-- Interview preparation
-- Career knowledge base (RAG)
-
----
-
-# Vision
-
-MailMindAI is the first module of a larger project called **Career Assistant AI**.
-
-The long-term goal is to build a privacy-first, open-source AI career operating system that helps people from their first job search all the way to receiving an offer.
-
-Everything will continue to run locally whenever possible, giving users complete control over their personal data.
+- ✅ Continuous Gmail monitoring
+- ✅ Local AI email classification
+- ✅ AI guardrails
+- ✅ Interview detail extraction
+- ✅ SQLite persistence
+- ✅ WhatsApp notifications
+- ✅ Duplicate email prevention
+- ✅ Background polling
 
 ---
 
@@ -223,34 +191,38 @@ Everything will continue to run locally whenever possible, giving users complete
 
 Contributions are welcome.
 
-If you have ideas, improvements, or bug fixes, feel free to:
+If you'd like to improve the project, feel free to:
 
 - Open an Issue
 - Submit a Pull Request
 - Start a discussion
 
-Every contribution helps improve the project.
-
 ---
 
 # License
 
-A license will be selected before the first stable release (v1.0).
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
-Until then, the project remains under active development.
+See the `LICENSE` file for details.
 
 ---
 
-# Support the Project
+# Project Status
 
-If MailMindAI helps you during your job search, please consider:
+MailMindAI is under active development.
 
-- ⭐ Starring the repository
-- 🐛 Reporting bugs
-- 💡 Suggesting new features
-- 📢 Sharing the project with others
+The focus is on building practical, privacy-first AI automation using local Large Language Models.
 
-Your support helps make the project better for everyone.
+---
+
+# Support
+
+If you found this project interesting:
+
+- ⭐ Star the repository
+- 🐛 Report bugs
+- 💡 Suggest improvements
+- 📢 Share it with others
 
 ---
 
